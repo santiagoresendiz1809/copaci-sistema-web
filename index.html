@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso al Sistema - COPACI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="auth-body">
+    <div class="auth-container">
+        <header class="auth-header">
+            <h1>Sistema COPACI</h1>
+            <p>Consejo de Participación Ciudadana</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" id="tabLoginBtn" onclick="toggleAuthForm('login')">Iniciar Sesión</button>
+            <button class="tab-btn" id="tabRegisterBtn" onclick="toggleAuthForm('register')">Registro de Vecino</button>
+        </div>
+
+        <section id="loginSection" class="form-section active">
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Correo Electrónico</label>
+                    <input type="email" id="loginEmail" required placeholder="ejemplo@correo.com">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña</label>
+                    <input type="password" id="loginPassword" required placeholder="********">
+                </div>
+                <button type="submit" class="btn btn-primary full-width">Ingresar</button>
+            </form>
+        </section>
+
+        <section id="registerSection" class="form-section">
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regName">Nombre Completo</label>
+                    <input type="text" id="regName" required placeholder="Juan Pérez">
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Correo Electrónico</label>
+                    <input type="email" id="regEmail" required placeholder="vecino@correo.com">
+                </div>
+                <div class="form-group">
+                    <label for="regAddress">Dirección Completa</label>
+                    <input type="text" id="regAddress" required placeholder="Calle, Número, Manzana/Lote">
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Contraseña</label>
+                    <input type="password" id="regPassword" required placeholder="Mínimo 6 caracteres">
+                </div>
+                <button type="submit" class="btn btn-secondary full-width">Crear Cuenta</button>
+            </form>
+        </section>
+        
+        <div id="authAlert" class="alert hidden"></div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        function toggleAuthForm(formType) {
+            const loginSection = document.getElementById('loginSection');
+            const registerSection = document.getElementById('registerSection');
+            const loginBtn = document.getElementById('tabLoginBtn');
+            const regBtn = document.getElementById('tabRegisterBtn');
+            const alertBox = document.getElementById('authAlert');
+            alertBox.classList.add('hidden');
+
+            if (formType === 'login') {
+                loginSection.classList.add('active');
+                registerSection.classList.remove('active');
+                loginBtn.classList.add('active');
+                regBtn.classList.remove('active');
+            } else {
+                loginSection.classList.remove('active');
+                registerSection.classList.add('active');
+                loginBtn.classList.remove('active');
+                regBtn.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

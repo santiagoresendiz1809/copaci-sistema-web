@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - COPACI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dashboard-body">
+    <nav class="navbar">
+        <div class="nav-brand">
+            <h2>COPACI Digital</h2>
+            <span id="userRoleBadge" class="badge">Vecino</span>
+        </div>
+        <div class="nav-user">
+            <span id="userNameDisplay">Cargando...</span>
+            <button class="btn btn-outline" onclick="logout()">Cerrar Sesión</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- VISTA DE VECINO -->
+        <div id="vecinoView" class="hidden">
+            <header class="main-header">
+                <h3>Ventanilla Única de Atención Vecinal</h3>
+                <p>Genere sus trámites oficiales y reporte fallas en los servicios de su comunidad.</p>
+            </header>
+
+            <div class="grid-2">
+                <!-- Formulario de Trámite -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Solicitud de Constancia de Residencia</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="constanciaForm">
+                            <div class="form-group">
+                                <label for="tramiteNombre">Nombre del Solicitante</label>
+                                <input type="text" id="tramiteNombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tramiteCurp">CURP</label>
+                                <input type="text" id="tramiteCurp" maxlength="18" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tramiteTiempo">Años Radicando en la Comunidad</label>
+                                <input type="number" id="tramiteTiempo" min="1" max="100" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="tramiteMotivo">Motivo de Expedición</label>
+                                <textarea id="tramiteMotivo" rows="2" required placeholder="Fines laborales, escolares, etc."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary full-width">Registrar Solicitud</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Formularios de Reportes -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Reporte de Servicios Públicos</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="tabs sub-tabs">
+                            <button class="tab-btn active" id="tabLuminaria" onclick="toggleReportSubForm('luminaria')">Luminarias</button>
+                            <button class="tab-btn" id="tabBacheo" onclick="toggleReportSubForm('bacheo')">Bacheo</button>
+                        </div>
+
+                        <!-- Subformulario Luminaria -->
+                        <form id="luminariaForm" class="report-form active">
+                            <div class="form-group">
+                                <label for="lumUbicacion">Ubicación / Entre Calles</label>
+                                <input type="text" id="lumUbicacion" required placeholder="Ej. Calle Morelos esq. Hidalgo">
+                            </div>
+                            <div class="form-group">
+                                <label for="lumPoste">Número de Poste (si visible)</label>
+                                <input type="text" id="lumPoste" placeholder="Ej. CFE-2342">
+                            </div>
+                            <div class="form-group">
+                                <label for="lumProblema">Tipo de Falla</label>
+                                <select id="lumProblema" required>
+                                    <option value="Lampara Fundida">Lámpara fundida / Apagada</option>
+                                    <option value="Intermitente">Luz intermitente</option>
+                                    <option value="Poste Danado">Poste dañado o inclinado</option>
+                                    <option value="Cableado Expuesto">Cableado expuesto</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary full-width">Enviar Reporte de Luminaria</button>
+                        </form>
+
+                        <!-- Subformulario Bacheo -->
+                        <form id="bacheoForm" class="report-form">
+                            <div class="form-group">
+                                <label for="bachUbicacion">Dirección Exacta del Bache</label>
+                                <input type="text" id="bachUbicacion" required placeholder="Ej. Av. Principal frente al num. 45">
+                            </div>
+                            <div class="form-group">
+                                <label for="bachDimension">Dimensión Aproximada</label>
+                                <select id="bachDimension" required>
+                                    <option value="Pequeno (< 50cm)">Pequeño (&lt; 50 cm)</option>
+                                    <option value="Mediano (50cm - 1m)">Mediano (50 cm a 1 m)</option>
+                                    <option value="Grande (> 1m)">Grande (&gt; 1 m)</option>
+                                    <option value="Zanja">Zanja transversal</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="bachReferencia">Referencias Adicionales</label>
+                                <textarea id="bachReferencia" rows="2" placeholder="Cerca de la tienda, carril derecho..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary full-width">Enviar Reporte de Bacheo</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista Previa de Comprobante -->
+            <div id="comprobanteContainer" class="card mt-4 hidden">
+                <div class="card-header flex-between">
+                    <h4>Acuse de Registro Digital</h4>
+                    <button class="btn btn-secondary btn-sm" onclick="window.print()">Imprimir Acuse</button>
+                </div>
+                <div class="card-body printable-area" id="comprobanteBody">
+                    <!-- Contenido dinámico generado por tramites.js -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA DE ADMINISTRADOR -->
+        <div id="adminView" class="hidden">
+            <header class="main-header">
+                <h3>Panel de Administración General - COPACI</h3>
+                <p>Gestión operativa, actualización de estatus y seguimiento de trámites ciudadanos.</p>
+            </header>
+
+            <!-- Métricas Clave -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h5>Total Trámites</h5>
+                    <span id="metricTramites" class="metric-value">0</span>
+                </div>
+                <div class="metric-card">
+                    <h5>Reportes de Alumbrado</h5>
+                    <span id="metricLuminarias" class="metric-value">0</span>
+                </div>
+                <div class="metric-card">
+                    <h5>Reportes de Bacheo</h5>
+                    <span id="metricBacheo" class="metric-value">0</span>
+                </div>
+            </div>
+
+            <!-- Tabla de Constancias -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>Trámites de Constancia de Residencia</h4>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table" id="tablaTramitesAdmin">
+                        <thead>
+                            <tr>
+                                <th>Folio</th>
+                                <th>Fecha</th>
+                                <th>Solicitante</th>
+                                <th>CURP</th>
+                                <th>Años Res.</th>
+                                <th>Estatus Actual</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Generado dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tabla de Reportes -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>Gestión de Incidencias Urbanas</h4>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table" id="tablaReportesAdmin">
+                        <thead>
+                            <tr>
+                                <th>Folio</th>
+                                <th>Categoría</th>
+                                <th>Ubicación</th>
+                                <th>Detalle Falla</th>
+                                <th>Reportado Por</th>
+                                <th>Estatus Actual</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Generado dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="js/tramites.js"></script>
+    <script src="js/reportes.js"></script>
+    <script src="js/admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = checkSession();
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            document.getElementById('userNameDisplay').textContent = user.nombre;
+            const badge = document.getElementById('userRoleBadge');
+            badge.textContent = user.rol.toUpperCase();
+
+            if (user.rol === 'admin') {
+                badge.classList.add('badge-admin');
+                document.getElementById('adminView').classList.remove('hidden');
+                inicializarAdmin();
+            } else {
+                badge.classList.add('badge-vecino');
+                document.getElementById('vecinoView').classList.remove('hidden');
+                document.getElementById('tramiteNombre').value = user.nombre;
+            }
+        });
+
+        function toggleReportSubForm(type) {
+            const lumForm = document.getElementById('luminariaForm');
+            const bachForm = document.getElementById('bacheoForm');
+            const tabLum = document.getElementById('tabLuminaria');
+            const tabBach = document.getElementById('tabBacheo');
+
+            if (type === 'luminaria') {
+                lumForm.classList.add('active');
+                bachForm.classList.remove('active');
+                tabLum.classList.add('active');
+                tabBach.classList.remove('active');
+            } else {
+                lumForm.classList.remove('active');
+                bachForm.classList.add('active');
+                tabLum.classList.remove('active');
+                tabBach.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
